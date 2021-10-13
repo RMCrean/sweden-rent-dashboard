@@ -1,0 +1,31 @@
+All Data was taken from: https://www.scb.se/ and saved as a .xslx file with headings.
+
+
+Files 1 + 2: "Annual_Rent_2016_2021_by_Municipalities.xlsx" + "New_Rent_2016_2021_by_Municipalities.xlsx"
+# Split in two as easy to read into pandas that way. 
+Description: Medium + Average rents costs in SEK (with errors) for both Annual and New rent per m2.
+New rent refers to the new rent that the tenant pays in the current year, usually from January.
+Broken down by all 290 municipalities. 
+Selections Made on Website Table creation section: All possible. 
+URL: https://www.statistikdatabasen.scb.se/pxweb/en/ssd/START__BO__BO0406__BO0406E/BO0406Tab01/
+
+Official statistics: Yes
+Latest update: 2021-10-01
+
+Official description: Statistics show rent levels and rent changes in rental dwellings. 
+The data is reported by region (municipal level and up), apartment type (number of rooms) and ownership category. 
+The survey is based on a statistical sample of approximately 15,500 dwellings 
+in multi-dwelling buildings and one- or two-dwelling buildings throughout the country.
+
+
+Files 3+4: "Annual_Rent_2016_2021_by_County.xslx" + "New_Rent_2016_2021_by_County.xslx"
+Description: Same as above but by County now. 
+URL: https://www.statistikdatabasen.scb.se/pxweb/en/ssd/START__BO__BO0406__BO0406E/BO0406Tab01/
+Selections Made on Website Table creation section: All.
+Official statistics: Yes
+Latest update: 2021-10-01
+Official description: Same as above. 
+
+
+
+
