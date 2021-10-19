@@ -80,6 +80,8 @@ rent_increase_explain_p1 = html.P(["Rent price increases are the change (normall
 
 rent_increase_explain_p2 = html.P([
     html.B("Please note that for a fairer comparison between the years, only municipalities with complete data across 2016-2021 are included (222 of the 290 municipalities). "),
+        "The below graph combines a scatter plot (of each municipality's value for each year - which you can hover on), and a \"violin plot\". " ,
+        "Violin plots are a way to show the distribution of rent prices for each year. Roughly speaking, the thicker the violin at a given price point, the more common/frequent that value is.",
 ])
 
 
@@ -723,10 +725,10 @@ def inflation_on_off_overview(inflation_selection):
         box_fig = go.Figure()
         for idx, year in enumerate(years):
             df = df_new_rent_kommun[(df_new_rent_kommun["Year"] == year)] 
-            box_fig.add_trace(go.Violin(x=df["Year"], y=df["Median Rent (SEK)"], customdata=df,
-                                        name=year, box_visible=False, meanline_visible=True, line_color=violin_colors[idx]
+            box_fig.add_trace(go.Violin(x=df["Year"], y=df["Median Rent (SEK)"], customdata=df, name=year, 
+                                        box_visible=False, meanline_visible=True, line_color=violin_colors[idx], hoveron="points", #here todo
                                         ))
-            box_fig.update_traces(hovertemplate="<b>%{customdata[0]} </b><br><br>Median Cost: %{customdata[5]} SEK<extra></extra>") 
+            box_fig.update_traces(hovertemplate="<b>%{customdata[0]} </b><br><br>Median Cost: %{customdata[3]} SEK<extra></extra>") #here  
 
         scatter_fig = go.Figure()
         for county in (df_new_rent_county["county"].unique()):
@@ -735,18 +737,18 @@ def inflation_on_off_overview(inflation_selection):
                 mode="lines+markers", customdata=df,
                 marker=dict(size=12, line=dict(width=2, color='DarkSlateGrey')),
             ))
-            scatter_fig.update_traces(hovertemplate="<b>%{customdata[0]} </b><br><br>Median Cost: %{customdata[5]} SEK<extra></extra>") 
+            scatter_fig.update_traces(hovertemplate="<b>%{customdata[0]} </b><br><br>Median Cost: %{customdata[3]} SEK<extra></extra>") 
 
     # Params independant of callback below.
     box_fig.update_layout(
         yaxis=dict(title="Median Annual Rent Increase per M<sup>2</sup> (SEK)", titlefont_size=18, tickfont_size=14),
-        xaxis=dict(title="", tickfont_size=14), margin={"r":0,"t":0,"l":0,"b":0}
+        xaxis=dict(title="", tickfont_size=14), margin={"r":0,"t":25,"l":0,"b":0}
     )
     box_fig.update_traces(meanline_visible=True, points="all", jitter=0.40, scalemode="count") 
     
     scatter_fig.update_layout(
         xaxis=dict(title="Median Annual Rent Increase per M<sup>2</sup> (SEK)", titlefont_size=18, tickfont_size=14),
-        yaxis=dict(title="", tickfont_size=14), margin={"r":0,"t":0,"l":0,"b":0}, 
+        yaxis=dict(title="", tickfont_size=14), margin={"r":0,"t":25,"l":0,"b":0}, 
     )
     
 
@@ -825,7 +827,7 @@ def get_card(clickData, kommun_or_county):
 
         fig.update_layout(
             xaxis=dict(title="", tickfont_size=14, tickmode = "array", tickvals = [2016, 2017, 2018, 2019, 2020, 2021]),
-            yaxis=dict(title="Median Rent (SEK)", titlefont_size=18, tickfont_size=14), margin={"r":0,"t":0,"l":0,"b":0}, 
+            yaxis=dict(title="Median Rent (SEK)", titlefont_size=18, tickfont_size=14), margin={"r":0,"t":30,"l":0,"b":0}, 
         )
 
         card_content = [
@@ -910,7 +912,7 @@ def update_specifics_page(kommun):
     median_bar_fig.update_layout(
         yaxis=dict(title="", tickfont_size=13, tickmode = "array", tickvals = [2016, 2017, 2018, 2019, 2020, 2021]),
         xaxis=dict(title="Median Annual Rent per square meter (SEK)", titlefont_size=16, tickfont_size=13),
-        margin={"r":0,"t":0,"l":0,"b":0}, coloraxis_showscale=False,
+        margin={"r":0,"t":30,"l":0,"b":0}, coloraxis_showscale=False,
     )
     median_bar_fig.update_traces(marker_line_color="black", marker_line_width=1.5, opacity=0.6)
 
@@ -918,7 +920,7 @@ def update_specifics_page(kommun):
     increase_bar_fig.update_layout(
         yaxis=dict(title="", tickfont_size=13, tickmode = "array", tickvals = [2016, 2017, 2018, 2019, 2020, 2021]),
         xaxis=dict(title="Median Annual Increase in Rent per square meter (SEK)", titlefont_size=16, tickfont_size=13),
-        margin={"r":0,"t":0,"l":0,"b":0}, coloraxis_showscale=False,
+        margin={"r":0,"t":30,"l":0,"b":0}, coloraxis_showscale=False,
     )
     increase_bar_fig.update_traces(marker_line_color="black", marker_line_width=1.5, opacity=0.6)
 
@@ -971,7 +973,7 @@ def update_specifics_page(kommun):
                                             ))
             scatter_fig.update_traces(hovertemplate="<b>%{customdata[0]} </b><br><br>Median Cost: %{customdata[3]} SEK<extra></extra>") 
         
-    scatter_fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, xaxis=dict(title="", tickfont_size=14))
+    scatter_fig.update_layout(margin={"r":0,"t":30,"l":0,"b":0}, xaxis=dict(title="", tickfont_size=14))
     scatter_fig.update_layout(yaxis=dict(title="Median Annual Rent per m<sup>2</sup> (SEK)", titlefont_size=18, tickfont_size=14))
 
 
