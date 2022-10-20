@@ -56,7 +56,8 @@ hr_styles = {"v1": {"border": "2px lightgray solid"}, "v2": {
 ####################################################################
 
 ################ random extras. ################
-sidebar_text = "An interactive dashboard built with python that enables you to visualise how rent prices differ across Sweden."
+sidebar_text = """An interactive dashboard built with python that enables you to visualise how rent prices differ across Sweden.
+This dashboard is designed for visualisation on a laptop/PC and will render weirdly on a mobile device unfortunately."""
 
 graph_title_1 = html.H5(
     ["Median Annual Rent per m", html.Sup(2), " (SEK)"], className="text-center")
@@ -73,15 +74,21 @@ overview_page_text = html.P(["The bar graph and choropleth map shown below depic
 card_body_title_kommun = html.H5(
     "The Top 10 Most and Least Expensive Municipalities to Rent in.", className="text-center")
 card_body_text_kommun = html.P([
-    html.Li("Of the ten most expensive municipalities, only two (Lomma in 6th and Uppsala in 10th) are not located in Stockholm county."),
-    html.Li(["Vallentuna is now the most expensive municipality to rent in (last year it was Täby Municipality),",
-             "with it's median annual rent per square meter increasing by over 20% in the last year alone."]),
+    html.Li("Of the ten most expensive municipalities, only two (Uppsala in 8th and Värmdo in 10th) are not located in Stockholm county."),
+    html.Li(["Täby and Vallentuna are by far and away the most expensive municipalities to rent in. ",
+             "The median annual rent per square meter in Täby increased by over 20% last year."]),
+    html.Li(["""7/10 of the cheapest municipalities to rent in are located in Norrland, with cheap options further south
+    including "Olofström", "Nybro", and "Gullspång"."""]),
+
 ])
-# TODO = update this text for 2022.
 
 card_body_title_county = html.H5(
-    "Differences in Median Annual Rent per Square Meter For All 21 Counties (län).", className="text-center")
+    "Differences in Median Annual Rent per Square Meter For All of Sweden's 21 Counties.", className="text-center")
 card_body_text_county = html.P([
+    html.Li(["Stockholm County is unsurprisingly the most expensive county to rent in with rent prices having increased by ~4% in the last year."]),
+    html.Li(["""Other counties with large cities follow closely behind, such as Uppsala County (containing Uppsala - Sweden's 4th largest city)
+    and Skåne (containing Mälmo, Sweden's 3rd largest city). """]),
+    html.Li(["The maximum difference in median rent costs at the county level is ~40%, (obtained by comparing Stockholm County to Jämtland County)."]),
 ])
 
 # Define rent increase and inflation calculation method.  - overview page.
@@ -252,7 +259,7 @@ def inflation_adjust(unadj_value: float, year: int) -> float:
     # UPDATE - now using all of 2021 monnths are Jan to Sep average for 2022.
 
     cpi_rates = {"2016": 316.43, "2017": 322.11, "2018": 328.40,
-                 "2019": 334.26, "2020": 335.92, "2021": 343.19, "2022": 366.11, }
+                 "2019": 334.26, "2020": 335.92, "2021": 343.19, "2022": 366.11}
 
     if year == 2016:
         adj_value = (unadj_value * cpi_rates["2016"]) / cpi_rates["2016"]
@@ -663,7 +670,7 @@ def render_overview_page(kommun_or_county):
                      color="Median Rent (SEK)", color_continuous_scale="ylgnbu")
         fig.add_hline(y=9.5, line_width=3,
                       line_dash="dash", line_color="black")
-        fig.update_xaxes(range=[0, 1850])
+        fig.update_xaxes(range=[0, 2000])
 
         # now choropleth map
         choro_df = dfs["rent_kommun"][(dfs["rent_kommun"]["Year"] == 2022)]
@@ -975,11 +982,11 @@ def update_specifics_page(kommun):
     # line now updated for new data with year 2022.
 
     # Median rent increase from last year.
-    rent_2021 = df_2022[df_2022["kommun"].apply(
+    rent_2022 = df_2022[df_2022["kommun"].apply(
         lambda x: x == kommun)]["Median Rent (SEK)"]
-    rent_2020 = df_2021[df_2021["kommun"].apply(
+    rent_2021 = df_2021[df_2021["kommun"].apply(
         lambda x: x == kommun)]["Median Rent (SEK)"]
-    percent_increase = round((float(rent_2021)/float(rent_2020)*100) - 100, 1)
+    percent_increase = round((float(rent_2022)/float(rent_2021)*100) - 100, 1)
     percent_increase_line = [html.Li(
         f"{kommun} municipalities median rent increased by {percent_increase}% this year.")]
 
