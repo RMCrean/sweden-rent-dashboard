@@ -44,7 +44,7 @@ content_style = {"margin-left": "2rem",
 
 # colour scheme for violin plots.
 violin_colors = ["lightseagreen", "green",
-                 "goldenrod", "magenta", "mediumpurple", "red"]
+                 "goldenrod", "magenta", "mediumpurple", "red", "black"]  # updated for new data.
 
 # horizontal rule styles.
 hr_styles = {"v1": {"border": "2px lightgray solid"}, "v2": {
@@ -56,7 +56,8 @@ hr_styles = {"v1": {"border": "2px lightgray solid"}, "v2": {
 ####################################################################
 
 ################ random extras. ################
-sidebar_text = "An interactive dashboard built with python that enables you to visualise how rent prices differ across Sweden."
+sidebar_text = """An interactive dashboard built with python that enables you to visualise how rent prices differ across Sweden.
+This dashboard is designed for visualisation on a laptop/PC and will render weirdly on a mobile device unfortunately."""
 
 graph_title_1 = html.H5(
     ["Median Annual Rent per m", html.Sup(2), " (SEK)"], className="text-center")
@@ -73,14 +74,21 @@ overview_page_text = html.P(["The bar graph and choropleth map shown below depic
 card_body_title_kommun = html.H5(
     "The Top 10 Most and Least Expensive Municipalities to Rent in.", className="text-center")
 card_body_text_kommun = html.P([
-    html.Li("Of the ten most expensive municipalities, only two (Lomma in 6th and Uppsala in 10th) are not located in Stockholm county."),
-    html.Li(["Vallentuna is now the most expensive municipality to rent in (last year it was Täby Municipality),",
-             "with it's median annual rent per square meter increasing by over 20% in the last year alone."]),
+    html.Li("Of the ten most expensive municipalities, only two (Uppsala in 8th and Värmdo in 10th) are not located in Stockholm county."),
+    html.Li(["Täby and Vallentuna are by far and away the most expensive municipalities to rent in. ",
+             "The median annual rent per square meter in Täby increased by over 20% last year."]),
+    html.Li(["""7/10 of the cheapest municipalities to rent in are located in Norrland, with cheap options further south
+    including "Olofström", "Nybro", and "Gullspång"."""]),
+
 ])
 
 card_body_title_county = html.H5(
-    "Differences in Median Annual Rent per Square Meter For All 21 Counties (län).", className="text-center")
+    "Differences in Median Annual Rent per Square Meter For All of Sweden's 21 Counties.", className="text-center")
 card_body_text_county = html.P([
+    html.Li(["Stockholm County is unsurprisingly the most expensive county to rent in with rent prices having increased by ~4% in the last year."]),
+    html.Li(["""Other counties with large cities follow closely behind, such as Uppsala County (containing Uppsala - Sweden's 4th largest city)
+    and Skåne (containing Mälmo, Sweden's 3rd largest city). """]),
+    html.Li(["The maximum difference in median rent costs at the county level is ~40%, (obtained by comparing Stockholm County to Jämtland County)."]),
 ])
 
 # Define rent increase and inflation calculation method.  - overview page.
@@ -95,7 +103,7 @@ rent_increase_explain_p1 = html.P([
 
 rent_increase_explain_p2 = html.P([
     html.B(["Please note that for a fairer comparison between the years, only municipalities with complete data",
-            "across 2016-2021 are included (222 of the 290 municipalities). "]),
+            "across 2016-2022 are included (221 of the 290 municipalities). "]),  # 222 to 221, with 2022 data.
     "The below graph combines a scatter plot (of each municipality's value for each year - ",
     "which you can hover on), and a \"violin plot\". ", "Violin plots are a way to show the",
     "distribution of rent prices for each year. Roughly speaking, the thicker the violin at",
@@ -105,7 +113,7 @@ rent_increase_explain_p2 = html.P([
 
 ################ rent_vs_time page text ################
 rent_vs_time_info_text = html.P([
-    "The map below allows you to compare how rent prices have changed over recent years (2016-2021). ",
+    "The map below allows you to compare how rent prices have changed over recent years (2016-2022). ",
     "Values shown are the same as those in the overview page (Annual rent per m", html.Sup(
         2),
     "). You can also choose whether to study the map at the municipality or county perspective. ",
@@ -212,7 +220,7 @@ with open("assets/kommun_urls.json", "r") as json_file:
 ################ Data prep for overview page ################
 # Define Top 10 most expensive and least expensive kommuner to live in.
 kommun_bar_df = dfs["rent_kommun"][dfs["rent_kommun"]
-                                   ["Year"].apply(lambda x: x == 2021)]
+                                   ["Year"].apply(lambda x: x == 2022)]
 # remove missing values
 kommun_bar_df = kommun_bar_df[~(kommun_bar_df["Median Rent (SEK)"] <= 0)]
 kommun_bar_df = kommun_bar_df.sort_values(
@@ -221,7 +229,7 @@ kommun_bar_df = kommun_bar_df.iloc[np.r_[0:10, -10:0]]  # filter for plotting.
 
 # As there are 21 counties, show all on the bar graph but sort them first.
 county_bar_df = dfs["rent_county"][dfs["rent_county"]
-                                   ["Year"].apply(lambda x: x == 2021)]
+                                   ["Year"].apply(lambda x: x == 2022)]
 # remove missing values
 county_bar_df = county_bar_df[~(county_bar_df["Median Rent (SEK)"] <= 0)]
 county_bar_df = county_bar_df.sort_values(
@@ -248,8 +256,10 @@ def inflation_adjust(unadj_value: float, year: int) -> float:
     """
     # From: https://www.scb.se/en/finding-statistics/statistics-by-subject-area/prices-and-consumption/consumer-price-index/consumer-price-index-cpi/pong/tables-and-graphs/consumer-price-index-cpi/cpi-fixed-index-numbers-1980100/
     # For 2021, the average from Jan to Aug was used (only data available at the time).
+    # UPDATE - now using all of 2021 monnths are Jan to Sep average for 2022.
+
     cpi_rates = {"2016": 316.43, "2017": 322.11, "2018": 328.40,
-                 "2019": 334.26, "2020": 335.92, "2021": 340.70}
+                 "2019": 334.26, "2020": 335.92, "2021": 343.19, "2022": 366.11}
 
     if year == 2016:
         adj_value = (unadj_value * cpi_rates["2016"]) / cpi_rates["2016"]
@@ -263,9 +273,11 @@ def inflation_adjust(unadj_value: float, year: int) -> float:
         adj_value = (unadj_value * cpi_rates["2020"]) / cpi_rates["2016"]
     elif year == 2021:
         adj_value = (unadj_value * cpi_rates["2021"]) / cpi_rates["2016"]
+    elif year == 2022:
+        adj_value = (unadj_value * cpi_rates["2022"]) / cpi_rates["2016"]
     else:
         raise ValueError(
-            "year parameter can only be within the range 2016-2021.")
+            "year parameter can only be within the range 2016-2022.")
     return adj_value
 
 
@@ -337,7 +349,7 @@ rent_prices_overview = [
     page_banner[0],
     page_banner[1],
     html.Br(),
-    html.H4("An Overview of Current Rent Prices Throughout Sweden (As of January 2021).", style={
+    html.H4("An Overview of Current Rent Prices Throughout Sweden (As of January 2022).", style={
             "textAlign": "center"}),
     html.Hr(style=hr_styles["v2"]),
 
@@ -460,7 +472,7 @@ rent_prices_vs_time = [
     dbc.Row([
         dbc.Col([
             dcc.Slider(
-                min=2016, max=2021, step=1, value=2021, id="year-slider",
+                min=2016, max=2022, step=1, value=2022, id="year-slider",
                 marks={
                     2016: {"label": "2016", "style": {"font-size": "18px"}},
                     2017: {"label": "2017", "style": {"font-size": "18px"}},
@@ -468,6 +480,7 @@ rent_prices_vs_time = [
                     2019: {"label": "2019", "style": {"font-size": "18px"}},
                     2020: {"label": "2020", "style": {"font-size": "18px"}},
                     2021: {"label": "2021", "style": {"font-size": "18px"}},
+                    2022: {"label": "2022", "style": {"font-size": "18px"}}
                 },
             )
         ], width={"size": 8, "offset": 2}, className="mb-2"),
@@ -657,10 +670,10 @@ def render_overview_page(kommun_or_county):
                      color="Median Rent (SEK)", color_continuous_scale="ylgnbu")
         fig.add_hline(y=9.5, line_width=3,
                       line_dash="dash", line_color="black")
-        fig.update_xaxes(range=[0, 1850])
+        fig.update_xaxes(range=[0, 2000])
 
         # now choropleth map
-        choro_df = dfs["rent_kommun"][(dfs["rent_kommun"]["Year"] == 2021)]
+        choro_df = dfs["rent_kommun"][(dfs["rent_kommun"]["Year"] == 2022)]
         choro_map = px.choropleth_mapbox(choro_df, geojson=kommuner_map, locations="Relation",
                                          featureidkey="id", opacity=0.8, height=800,
                                          color="Median Rent (SEK)", color_continuous_scale="ylgnbu",
@@ -682,7 +695,7 @@ def render_overview_page(kommun_or_county):
                      color="Median Rent (SEK)", color_continuous_scale="ylgnbu")
 
         # now choropleth map
-        choro_df = dfs["rent_county"][(dfs["rent_county"]["Year"] == 2021)]
+        choro_df = dfs["rent_county"][(dfs["rent_county"]["Year"] == 2022)]
         choro_map = px.choropleth_mapbox(choro_df, geojson=counties_map, locations="Relation",
                                          featureidkey="id", opacity=0.8, height=800,
                                          color="Median Rent (SEK)", color_continuous_scale="ylgnbu",
@@ -730,19 +743,19 @@ def render_overview_page(kommun_or_county):
 )
 def inflation_on_off_overview(inflation_selection):
     """Callback to update graphs with a correction for inflation or not."""
-    years = [2016, 2017, 2018, 2019, 2020, 2021]
+    years = [2016, 2017, 2018, 2019, 2020, 2021, 2022]
     # Take only those with data for each year.
     df_new_rent_kommun = dfs["new_rent_kommun"][~(
         dfs["new_rent_kommun"]["Median Rent (SEK)"] <= 0)]
     complete_kommuner = df_new_rent_kommun["kommun"].value_counts().reset_index(
-        name="count").query("count == 6")["index"]  # all 6 years.
+        name="count").query("count == 7")["index"]  # all 7 years. Updated for 2022 data.
     df_new_rent_kommun = df_new_rent_kommun[df_new_rent_kommun["kommun"].apply(
         lambda x: x in list(complete_kommuner))]
 
     df_new_rent_county = dfs["new_rent_county"][~(
         dfs["new_rent_county"]["Median Rent (SEK)"] <= 0)]
     complete_counties = df_new_rent_county["county"].value_counts().reset_index(
-        name="count").query("count == 6")["index"]  # all 6 years.
+        name="count").query("count == 7")["index"]  # all 7 years. Updated for 2022 data.
     df_new_rent_county = df_new_rent_county[df_new_rent_county["county"].apply(
         lambda x: x in list(complete_counties))]
 
@@ -896,7 +909,7 @@ def get_card(clickData, kommun_or_county):
                      color_continuous_scale="ylgnbu", range_color=[700, 1850])
         fig.update_layout(
             xaxis=dict(title="", tickfont_size=14, tickmode="array",
-                       tickvals=[2016, 2017, 2018, 2019, 2020, 2021]),
+                       tickvals=[2016, 2017, 2018, 2019, 2020, 2021, 2022]),
             yaxis=dict(title="Median Rent (SEK)", titlefont_size=18,
                        tickfont_size=14), margin={"r": 0, "t": 30, "l": 0, "b": 0}
         )
@@ -954,25 +967,26 @@ def update_specifics_page(kommun):
     county_name = get_key(kommun, county_kommun_mapping)
     numb_of_kommuner = len(county_kommun_mapping[county_name])
 
+    df_2022 = dfs["rent_kommun"][dfs["rent_kommun"]
+                                 ["Year"].apply(lambda x: x == 2022)]
     df_2021 = dfs["rent_kommun"][dfs["rent_kommun"]
                                  ["Year"].apply(lambda x: x == 2021)]
-    df_2020 = dfs["rent_kommun"][dfs["rent_kommun"]
-                                 ["Year"].apply(lambda x: x == 2020)]
 
     # Current median rent rank
-    df_2021 = df_2021.sort_values(by=["Median Rent (SEK)"], ascending=False)
-    df_2021["Rank"] = df_2021["Median Rent (SEK)"].rank(
+    df_2022 = df_2022.sort_values(by=["Median Rent (SEK)"], ascending=False)
+    df_2022["Rank"] = df_2022["Median Rent (SEK)"].rank(
         method="min", na_option="bottom", ascending=False)
-    kommun_rank = str(int(df_2021.loc[df_2021["kommun"] == kommun, "Rank"]))
+    kommun_rank = str(int(df_2022.loc[df_2022["kommun"] == kommun, "Rank"]))
     kommun_rank_line = [html.Li(
-        f"{kommun} is ranked {kommun_rank} out of 288, for the most expensive municipality to rent in (2 municipalities of 290 do not have data available for this year).")]
+        f"{kommun} is ranked {kommun_rank} out of 289, for the most expensive municipality to rent an apartment in. (One municipality out of the 290 in Sweden does not have data available for this year).")]
+    # line now updated for new data with year 2022.
 
     # Median rent increase from last year.
+    rent_2022 = df_2022[df_2022["kommun"].apply(
+        lambda x: x == kommun)]["Median Rent (SEK)"]
     rent_2021 = df_2021[df_2021["kommun"].apply(
         lambda x: x == kommun)]["Median Rent (SEK)"]
-    rent_2020 = df_2020[df_2020["kommun"].apply(
-        lambda x: x == kommun)]["Median Rent (SEK)"]
-    percent_increase = round((float(rent_2021)/float(rent_2020)*100) - 100, 1)
+    percent_increase = round((float(rent_2022)/float(rent_2021)*100) - 100, 1)
     percent_increase_line = [html.Li(
         f"{kommun} municipalities median rent increased by {percent_increase}% this year.")]
 
@@ -986,8 +1000,8 @@ def update_specifics_page(kommun):
     df_county = df_county.rename(columns={"county": "Place"})
     df_compare_county = pd.concat([df_county, df_local_kommuner])
 
-    # deal with the two years that have missing data.
-    if kommun in ["Ljusnarsberg", "Ragunda"]:
+    # updated for 2022 - only kommun without data.
+    if kommun in ["Munkedal"]:
         percent_increase_line = [html.Li(
             "Unfortunately no statistics can be calculated for this Municipality due to missing data.")]
         kommun_rank_line = [html.P("")]
@@ -997,7 +1011,7 @@ def update_specifics_page(kommun):
                             color="Median Rent (SEK)", color_continuous_scale="deep", orientation="h")
     median_bar_fig.update_layout(
         yaxis=dict(title="", tickfont_size=13, tickmode="array",
-                   tickvals=[2016, 2017, 2018, 2019, 2020, 2021]),
+                   tickvals=[2016, 2017, 2018, 2019, 2020, 2021, 2022]),
         xaxis=dict(title="Median Annual Rent per square meter (SEK)",
                    titlefont_size=16, tickfont_size=13),
         margin={"r": 0, "t": 30, "l": 0, "b": 0}, coloraxis_showscale=False,
@@ -1009,7 +1023,7 @@ def update_specifics_page(kommun):
                               color="Median Rent (SEK)", color_continuous_scale="deep", orientation="h")
     increase_bar_fig.update_layout(
         yaxis=dict(title="", tickfont_size=13, tickmode="array",
-                   tickvals=[2016, 2017, 2018, 2019, 2020, 2021]),
+                   tickvals=[2016, 2017, 2018, 2019, 2020, 2021, 2022]),
         xaxis=dict(title="Median Annual Increase in Rent per square meter (SEK)",
                    titlefont_size=16, tickfont_size=13),
         margin={"r": 0, "t": 30, "l": 0, "b": 0}, coloraxis_showscale=False,
@@ -1026,7 +1040,7 @@ def update_specifics_page(kommun):
         return 0
 
     choro_df = (dfs["rent_kommun"]
-                [(dfs["rent_kommun"]["Year"] == 2021)]).copy()
+                [(dfs["rent_kommun"]["Year"] == 2022)]).copy()
     choro_df["MarkedLabel"] = choro_df.apply(label_marked_kommun, axis=1)
     choro_map = px.choropleth_mapbox(choro_df, geojson=kommuner_map,
                                      locations="Relation", featureidkey="id", opacity=0.8, height=475,

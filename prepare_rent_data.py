@@ -49,8 +49,9 @@ def process_stat_data(excel_path: str, kommun_or_county: str) -> pd.DataFrame:
     pd.DataFrame
         Dataframe reformatted for easy plotting with Plotly library.
     """
-    columns_keep = [1, 4, 5, 6, 7, 8, 9]  # same for all.
-    years = ["2016", "2017", "2018", "2019", "2020", "2021"]  # same for all.
+    columns_keep = [1, 4, 5, 6, 7, 8, 9, 10]  # same for all.
+    # same for all.
+    years = ["2016", "2017", "2018", "2019", "2020", "2021", "2022"]
 
     if kommun_or_county == "kommun":
         skip_rows = [0, 1] + list(range(294, 355))
@@ -85,10 +86,10 @@ def process_stat_data(excel_path: str, kommun_or_county: str) -> pd.DataFrame:
 
 def main():
     """Processes excel files and saves output to .csv files."""
-    path_rent_kommun = "stats/Annual_Rent_2016_2021_by_Municipalities.xlsx"
-    path_rent_county = "stats/Annual_Rent_2016_2021_by_County.xlsx"
-    path_new_rent_kommun = "stats/New_Rent_2016_2021_by_Municipalities.xlsx"
-    path_new_rent_county = "stats/New_Rent_2016_2021_by_County.xlsx"
+    path_rent_kommun = "stats/Annual_Rent_2016_2022_by_Municipalities.xlsx"
+    path_rent_county = "stats/Annual_Rent_2016_2022_by_County.xlsx"
+    path_new_rent_kommun = "stats/New_Rent_2016_2022_by_Municipalities.xlsx"
+    path_new_rent_county = "stats/New_Rent_2016_2022_by_County.xlsx"
 
     dfs = {}
     dfs["rent_kommun"] = process_stat_data(path_rent_kommun, "kommun")
